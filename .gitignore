@@ -1,0 +1,7 @@
+__pycache__/
+client.json
+data.session
+keys.db
+log.txt
+test.py
+window.psd
