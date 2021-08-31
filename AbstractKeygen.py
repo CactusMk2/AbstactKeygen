@@ -18,8 +18,10 @@ from random import randint
 from json import loads
 from os.path import isfile
 
+def useless():
+	pass
 def stop_error(logerror="Error", brief="Error", error_text="Error"):
-	root.reg_btn.configure(command=exit)
+	root.reg_btn.configure(command=useless)
 	log.critical(logerror)
 	root.setNewKey(brief,error_text,False)
 	while True:

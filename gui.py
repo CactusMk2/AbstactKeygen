@@ -2,6 +2,7 @@ import tkinter as tk
 from colors import *
 from config import *
 from pyperclip import copy, paste
+import sys
 
 class Root(tk.Tk):
 	key = "Generating..."
@@ -97,4 +98,4 @@ class Root(tk.Tk):
 			try: self.update()
 			except: pass
 		else:
-			exit(1)
+			sys.exit()

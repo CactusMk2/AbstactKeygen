@@ -1,6 +1,7 @@
 from json import loads, dump
 from config import client_ids_file, SESSION_NAME
 import os
+import sys
 async def stop_connection():
 	await client.disconnect()
 
@@ -14,7 +15,7 @@ def error(text, clerror=True):
 	else:
 		print(text)
 	input("Hit enter to exit.")
-	exit()
+	sys.exit()
 
 
 if not os.path.isfile(client_ids_file):
@@ -51,26 +52,21 @@ async def check(client):
 	try:
 		await client.sign_in()
 	except:
-		await client.disconnect()
 		return
 	user = await client.get_me()
 	await error(f"ACCOUNT IS ALREADY CONNECTED TO {user.username}", False)
 
+from telethon import TelegramClient
+from telethon.errors.rpcerrorlist import FloodWaitError
+client = TelegramClient(SESSION_NAME, API_ID, API_HASH, timeout=4)
+client.loop.run_until_complete(check(client))
+
 try:
-	from telethon import TelegramClient
-	from telethon.errors.rpcerrorlist import FloodWaitError
-	client = TelegramClient(SESSION_NAME, API_ID, API_HASH, timeout=4)
-	client.loop.run_until_complete(check(client))
 	client.start(phone)
-	if not client.is_connected():
-		raise(OSError())
-
-
 except FloodWaitError:
 	error("FLOOD CONTROL, WAIT A WHILE AND THEN TRY AGAIN")
 except:
 	error("ERROR WHILE TRING TO CONNECT")
-else:
-	error("Script is completed", False)
 
-error("If you see this message that means something went wrong.", False)
+
+input("Script is completed\nPress enter to exit ")
