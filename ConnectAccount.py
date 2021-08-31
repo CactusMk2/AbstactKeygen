@@ -1,16 +1,15 @@
 from json import loads, dump
-from config import client_ids_file, SESSION_NAME, HOST
+from config import client_ids_file, SESSION_NAME
 import os
-import sqlite3
-
+async def stop_connection():
+	await client.disconnect()
 
 def error(text, clerror=True):
 	if clerror:
 		try:
-			client.disconnect()
+			client.loop.run_until_complete(stop_connection())
 			os.remove(SESSION_NAME+".session")
-		except:
-			print("ENABLE TO REMOVE SESSION FILE, REMOVE IT MANUALY")
+		except: pass
 		print("Connection error", text)
 	else:
 		print(text)
@@ -47,12 +46,21 @@ if not (API_HASH := client_configuration.get("API_HASH",False)):
 if not (phone := client_configuration.get("phone",False)):
 	phone = input("please enter your phone number: ")
 
-
+async def check(client):
+	await client.connect()
+	try:
+		await client.sign_in()
+	except:
+		await client.disconnect()
+		return
+	user = await client.get_me()
+	await error(f"ACCOUNT IS ALREADY CONNECTED TO {user.username}", False)
 
 try:
 	from telethon import TelegramClient
 	from telethon.errors.rpcerrorlist import FloodWaitError
-	client = TelegramClient(SESSION_NAME, API_ID, API_HASH)
+	client = TelegramClient(SESSION_NAME, API_ID, API_HASH, timeout=4)
+	client.loop.run_until_complete(check(client))
 	client.start(phone)
 	if not client.is_connected():
 		raise(OSError())
@@ -63,6 +71,6 @@ except FloodWaitError:
 except:
 	error("ERROR WHILE TRING TO CONNECT")
 else:
-	error("Script is completed", clerror=False)
+	error("Script is completed", False)
 
-error("If you see this message that means something went wrong.", clerror=False)
+error("If you see this message that means something went wrong.", False)

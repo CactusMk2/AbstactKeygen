@@ -70,6 +70,16 @@ async def get_messages(client):
 	root.generating = False
 
 
+
+async def check(client):
+	await client.connect()
+	try:
+		await client.sign_in()
+	except:
+		stop_error("Session is not up","Session error","Session is not associated\nwith any accounts")
+
+
+
 def update_keys():
 	try:
 		with sqlite3.connect(SESSION_NAME+".session") as db:
@@ -85,7 +95,8 @@ def update_keys():
 
 
 	from telethon import TelegramClient
-	client = TelegramClient(SESSION_NAME, API_ID, API_HASH)
+	client = TelegramClient(SESSION_NAME, API_ID, API_HASH, timeout=5)
+	client.loop.run_until_complete(check(client))
 	try:
 		with client:
 			client.loop.run_until_complete(get_messages(client))
